@@ -1,0 +1,32 @@
+{
+  "file_hashes": {
+    "app\\src\\androidTest\\java\\com\\example\\noreel\\ExampleInstrumentedTest.kt": "276a34c585e948e10178ba9951b2774ea2d0116dfb7a4f4eb987c4366c73e2f6",
+    "app\\src\\main\\assets\\Injector.js": "9006dc8aa61be016082de983821d3a755407725fe0b513fee941bb947b1a2064",
+    "app\\src\\main\\java\\com\\example\\noreel\\AndroidJSInterface.kt": "58ac6657d1944f25883630712beb7432eea5d61f03509adcdd1b09e4eae78f48",
+    "app\\src\\main\\java\\com\\example\\noreel\\ChromeViewport.kt": "5bc562c5fcee7170fbde398a0f2604def19ca3d538c9291fdd19f9144e7df75f",
+    "app\\src\\main\\java\\com\\example\\noreel\\InjectionBuilder.kt": "ac648e4dbdc2ff7e9ebf99331dee30ddb201d6fe98ad214106c26491190a4d4a",
+    "app\\src\\main\\java\\com\\example\\noreel\\MainActivity.kt": "873c456232338af95c60dacc74c9c5298762f8c575661f6489378b618ae68bed",
+    "app\\src\\main\\java\\com\\example\\noreel\\SettingsActivity.kt": "1bf33870fbacd1111b2cafa80642a06633def288888fe5c04eef71924a652525",
+    "app\\src\\main\\java\\com\\example\\noreel\\UpdateChecker.kt": "165b2187d3e84684d108788294d01e39c49be427093115f2499816cf22fdb252",
+    "app\\src\\main\\java\\com\\example\\noreel\\WebViewViewport.kt": "e3d0faeb41e6bbd2c12db7033d3a093d3d2eea1f8702c9614ab4e238556f041c",
+    "app\\src\\main\\java\\com\\example\\noreel\\ui\\theme\\Color.kt": "e49bb84a86fa4158d4c22ee4597127c1e5310e5449449c6d251d667b5e043f8f",
+    "app\\src\\main\\java\\com\\example\\noreel\\ui\\theme\\Theme.kt": "36babc37c5407c92da56aaa7dd026cc1e4eb71a2dce94efa0d71bdb7d46f006a",
+    "app\\src\\main\\java\\com\\example\\noreel\\ui\\theme\\Type.kt": "dec900ec27458ac7261eaca0ee3cc832125f8d3199a2108efe6ee2e6d4840c07",
+    "app\\src\\test\\java\\com\\example\\noreel\\ExampleUnitTest.kt": "4e3e73ae1a8b1d2dfb001bf27e4417396492a0228371f09a667d119df5f7412d"
+  },
+  "classifications": {
+    "app\\src\\main\\java\\com\\example\\noreel\\SettingsActivity.kt": "config",
+    "app\\src\\main\\java\\com\\example\\noreel\\ui\\theme\\Color.kt": "frontend",
+    "app\\src\\test\\java\\com\\example\\noreel\\ExampleUnitTest.kt": "test",
+    "app\\src\\androidTest\\java\\com\\example\\noreel\\ExampleInstrumentedTest.kt": "test",
+    "app\\src\\main\\java\\com\\example\\noreel\\WebViewViewport.kt": "frontend",
+    "app\\src\\main\\java\\com\\example\\noreel\\ui\\theme\\Type.kt": "frontend",
+    "app\\src\\main\\java\\com\\example\\noreel\\AndroidJSInterface.kt": "utility",
+    "app\\src\\main\\java\\com\\example\\noreel\\ChromeViewport.kt": "frontend",
+    "app\\src\\main\\java\\com\\example\\noreel\\ui\\theme\\Theme.kt": "frontend",
+    "app\\src\\main\\assets\\Injector.js": "utility",
+    "app\\src\\main\\java\\com\\example\\noreel\\UpdateChecker.kt": "job",
+    "app\\src\\main\\java\\com\\example\\noreel\\InjectionBuilder.kt": "utility",
+    "app\\src\\main\\java\\com\\example\\noreel\\MainActivity.kt": "entry_point"
+  }
+}
