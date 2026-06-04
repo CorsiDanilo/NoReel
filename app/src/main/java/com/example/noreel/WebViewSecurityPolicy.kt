@@ -10,7 +10,7 @@ object WebViewSecurityPolicy {
     const val REMOTE_INJECTOR_URL =
         "https://raw.githubusercontent.com/Kalbra/NoReel/master/app/src/main/assets/Injector.js"
     const val REMOTE_INJECTOR_SHA256 =
-        "9006dc8aa61be016082de983821d3a755407725fe0b513fee941bb947b1a2064"
+        "0cf7d6c3863940fb1262e04e8215536da34c018282ed50d0f09034096238eeac"
 
     private val trustedInstagramHosts = setOf("www.instagram.com", "instagram.com")
     private val externalBrowserSchemes = setOf("http", "https")

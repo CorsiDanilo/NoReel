@@ -64,7 +64,9 @@ class WebViewSecurityPolicyTest {
 
     @Test
     fun remoteInjectorRequiresExactUrlAndPinnedHash() {
-        val bundledInjector = projectFile("src/main/assets/Injector.js").readBytes()
+        val bundledInjector = projectFile("src/main/assets/Injector.js")
+            .readBytes()
+            .normalizedUtf8Bytes()
 
         assertTrue(WebViewSecurityPolicy.isAllowedRemoteInjectorUrl(WebViewSecurityPolicy.REMOTE_INJECTOR_URL))
         assertFalse(WebViewSecurityPolicy.isAllowedRemoteInjectorUrl("${WebViewSecurityPolicy.REMOTE_INJECTOR_URL}?cache=1"))
@@ -121,5 +123,12 @@ class WebViewSecurityPolicyTest {
         }
 
         error("Could not locate $relativeToApp from ${System.getProperty("user.dir")}")
+    }
+
+    private fun ByteArray.normalizedUtf8Bytes(): ByteArray {
+        return toString(Charsets.UTF_8)
+            .replace("\r\n", "\n")
+            .replace("\r", "\n")
+            .toByteArray(Charsets.UTF_8)
     }
 }
