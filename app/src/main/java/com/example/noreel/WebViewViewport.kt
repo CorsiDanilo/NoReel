@@ -10,7 +10,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
-class WebViewViewport(private val context: Context) : WebViewClient() {
+class WebViewViewport(
+    private val context: Context,
+    private val onUrlChanged: (String?) -> Unit = {}
+) : WebViewClient() {
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         val url = request?.url?.toString()
         if (request != null && !request.isForMainFrame) {
@@ -25,9 +28,20 @@ class WebViewViewport(private val context: Context) : WebViewClient() {
         return shouldBlockNavigation(url)
     }
 
+    override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+        super.onPageStarted(view, url, favicon)
+        onUrlChanged(url)
+    }
+
     override fun onPageFinished(view: WebView?, url: String?) {
         //injectJS(view)
         super.onPageFinished(view, url)
+        onUrlChanged(url)
+    }
+
+    override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
+        super.doUpdateVisitedHistory(view, url, isReload)
+        onUrlChanged(url)
     }
 
     override fun onReceivedError(

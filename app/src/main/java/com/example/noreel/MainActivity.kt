@@ -27,6 +27,9 @@ import src.UpdateChecker
 open class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
     private var settingsChanged: Boolean = false
 
+    @Volatile
+    private var currentUrl: String? = WebViewSecurityPolicy.HOME_URL
+
     private lateinit var webView: WebView
 
     var injector_content = ""
@@ -36,6 +39,7 @@ open class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPrefere
     }
 
     fun updateBrowser(webView: WebView) {
+        currentUrl = WebViewSecurityPolicy.HOME_URL
         webView.loadUrl(WebViewSecurityPolicy.HOME_URL)
     }
 
@@ -102,7 +106,7 @@ open class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPrefere
             preferences_button,
             this,
             Runnable { updateBrowser(webView) },
-            { webView.url }
+            { currentUrl }
         )
         webView.addJavascriptInterface(JSInterface, "Android")
 
@@ -127,7 +131,9 @@ open class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPrefere
                 }
             })
 
-        webView.webViewClient = WebViewViewport(this)
+        webView.webViewClient = WebViewViewport(this) { url ->
+            currentUrl = url
+        }
 
         onBackPressedDispatcher.addCallback(
             object : OnBackPressedCallback(true) {

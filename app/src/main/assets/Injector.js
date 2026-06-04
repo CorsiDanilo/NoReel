@@ -4,8 +4,9 @@ if (use_app_banner) {
     use_app_banner.style.display = "none";
 }
 
-const settings_icon = document.querySelector('a[href="/accounts/settings/?entrypoint=profile"]');
-if (settings_icon){
+const is_settings_page = window.location.pathname.includes('/accounts/settings') || window.location.pathname.includes('/settings/');
+const settings_icon = document.querySelector('a[href*="/accounts/settings"], a[href*="/settings/"]');
+if (settings_icon || is_settings_page){
     Android.setSettingsMenuButton();
 } else {
     Android.deleteSettingsMenuButton();

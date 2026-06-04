@@ -26,7 +26,7 @@ The `WebViewViewport` class, located in `app/src/main/java/com/example/noreel/We
 ### Class Definition
 
 ```kotlin
-class WebViewViewport() : WebViewClient()
+class WebViewViewport(private val context: Context, private val onUrlChanged: (String?) -> Unit = {}) : WebViewClient()
 ```
 
 ### Key Methods
@@ -113,7 +113,9 @@ val webView = findViewById<WebView>(R.id.webView)
 webView.settings.javaScriptEnabled = true
 
 // Attach custom Viewports
-webView.webViewClient = WebViewViewport()
+webView.webViewClient = WebViewViewport(context) { url ->
+    // Handle URL changed events
+}
 webView.webChromeClient = ChromeViewport()
 
 // Load initial URL

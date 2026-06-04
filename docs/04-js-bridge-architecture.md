@@ -74,9 +74,14 @@ val preferenceButton: Button = findViewById(R.id.pref_button)
 // Define the update logic
 val updateViewport = Runnable { webView.reload() }
 
-// Register the bridge
+// Register the bridge with a thread-safe URL provider callback
 webView.addJavascriptInterface(
-    AndroidJSInterface(preferenceButton, this, updateViewport), 
+    AndroidJSInterface(
+        preferenceButton,
+        this,
+        updateViewport,
+        { currentUrl } // Thread-safe cached URL provider
+    ), 
     "Android"
 )
 

@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Hardened the WebView bridge and remote injection flow with origin checks and SHA-256 pinning.
 - Disabled release debuggability and removed overbroad backup, permission, and provider exposure.
+- Fixed settings button accessibility by implementing thread-safe URL caching on the UI thread to resolve background thread crashes.
+- Made settings selector in Injector.js more robust to adapt to dynamic Instagram web layouts.
 
 ## [2.0.0] - 2026-03-06
 
