@@ -1,15 +1,10 @@
 package com.example.noreel
 
-import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Log
 import android.webkit.ConsoleMessage
+import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
-import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebChromeClient.FileChooserParams
-import android.webkit.WebView
 
 class ChromeViewport : WebChromeClient() {
     override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
@@ -21,28 +16,26 @@ class ChromeViewport : WebChromeClient() {
     }
 
     override fun onPermissionRequest(request: PermissionRequest?) {
-        Log.w("WebInternal", request.toString())
-        request?.grant(request.resources)
-    }
-/*
-    override fun onShowFileChooser(
-        webView: WebView?,
-        filePathCallback: ValueCallback<Array<Uri>>?,
-        fileChooserParams: FileChooserParams?
-    ): Boolean {
-        Log.d("WebInternal", "New File dialog")
-        this@MainActivity.filePathCallback = filePathCallback
+        val allowedResources = WebViewSecurityPolicy.allowedPermissionResources(
+            request?.origin?.toString(),
+            request?.resources
+        )
 
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = '*///*'
-/*
-        this@MainActivity.getFile.launch(intent)
+        if (allowedResources.isEmpty()) {
+            Log.w("WebInternal", "Denied permission request from ${request?.origin}")
+            request?.deny()
+            return
+        }
 
-        return true
+        Log.d("WebInternal", "Granted WebView resources: ${allowedResources.contentToString()}")
+        request?.grant(allowedResources)
     }
 
-    //Changing loading image to black
-    override fun getDefaultVideoPoster(): Bitmap? {
-        return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-    }*/
+    override fun onGeolocationPermissionsShowPrompt(
+        origin: String?,
+        callback: GeolocationPermissions.Callback?
+    ) {
+        Log.w("WebInternal", "Denied geolocation request from $origin")
+        callback?.invoke(origin, false, false)
+    }
 }

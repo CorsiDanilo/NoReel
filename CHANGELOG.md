@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2026-06-04
+
+### Fixed
+- Hardened the WebView bridge and remote injection flow with origin checks and SHA-256 pinning.
+- Disabled release debuggability and removed overbroad backup, permission, and provider exposure.
+
 ## [2.0.0] - 2026-03-06
 
 ### Highlights

@@ -43,10 +43,10 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="Injection Settings">
         <SwitchPreference
-                android:defaultValue="true"
+                android:defaultValue="false"
                 android:title="Remote script fetching"
                 android:key="remote_fetching"
-                android:summary="Fetch the newest version of the injection script via Github." />
+                android:summary="Fetch the injection script only when it matches the bundled integrity hash." />
     </PreferenceCategory>
     <PreferenceCategory android:title="More">
         <Preference

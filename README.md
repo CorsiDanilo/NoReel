@@ -25,6 +25,8 @@ The APK file must be installed manually. A tutorial how to install an APK file i
 
 For more versions visit the [relase tab](https://github.com/Kalbra/NoReel/releases).
 
+Current release: `v2.0.1`.
+
 ## Features
 ### Reel feed deactivation
 With this feature you can deactivate the reel feed. So you never spend hours scrolling through the feed again wasting your time.

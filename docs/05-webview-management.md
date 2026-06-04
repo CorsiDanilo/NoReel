@@ -70,11 +70,11 @@ class ChromeViewport : WebChromeClient()
 | Method | Purpose |
 | :--- | :--- |
 | `onConsoleMessage` | Intercepts JavaScript console logs and redirects them to the Android Logcat system under the tag `WebInternal`. |
-| `onPermissionRequest` | Automatically grants permission requests from the web content to the Android system. |
+| `onPermissionRequest` | Filters WebView permission requests by trusted origin and allowed resource before granting. |
 
 ### Debugging and Permissions
 
-The implementation ensures that web-side debugging is visible in the Android development environment and that necessary permissions are granted without blocking the user experience.
+The implementation only enables WebView debugging for debug builds and denies WebView permission requests unless both the requesting origin and resource are explicitly allowed.
 
 ```kotlin
 override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
@@ -86,8 +86,17 @@ override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
 }
 
 override fun onPermissionRequest(request: PermissionRequest?) {
-    Log.w("WebInternal", request.toString())
-    request?.grant(request.resources)
+    val allowedResources = WebViewSecurityPolicy.allowedPermissionResources(
+        request?.origin?.toString(),
+        request?.resources
+    )
+
+    if (allowedResources.isEmpty()) {
+        request?.deny()
+        return
+    }
+
+    request?.grant(allowedResources)
 }
 ```
 

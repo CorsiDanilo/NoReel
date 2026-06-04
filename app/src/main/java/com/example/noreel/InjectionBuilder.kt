@@ -2,64 +2,72 @@ package com.example.noreel
 
 import android.app.Application
 import android.content.SharedPreferences
-import android.content.pm.ApplicationInfo
 import android.util.Log
-import android.webkit.WebView
 import java.io.BufferedInputStream
+import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.CountDownLatch
 
 
 class InjectionBuilder(
     private val application: Application,
     private val preferences: SharedPreferences
 ) {
-    fun fetchRemote(callback: (String) -> Unit) {
-        val latch = CountDownLatch(1)
-        val urlString =
-            "https://raw.githubusercontent.com/Kalbra/NoReel/master/app/src/main/assets/Injector.js"
-
+    private fun fetchRemote(callback: (String?) -> Unit) {
         Thread {
+            var connection: HttpURLConnection? = null
+            var remoteCode: String? = null
+
             try {
-                val url = URL(urlString)
-                val connection = url.openConnection() as HttpURLConnection
+                if (!WebViewSecurityPolicy.isAllowedRemoteInjectorUrl(WebViewSecurityPolicy.REMOTE_INJECTOR_URL)) {
+                    Log.e("InjectionBuilder", "Remote injector URL is not allowed")
+                    return@Thread
+                }
+
+                val url = URL(WebViewSecurityPolicy.REMOTE_INJECTOR_URL)
+                connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
+                connection.instanceFollowRedirects = false
                 connection.connectTimeout = 1000
                 connection.readTimeout = 1000
 
                 if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-                    val inputStream = BufferedInputStream(connection.inputStream)
+                    val scriptBytes = BufferedInputStream(connection.inputStream).use { it.readBytes() }
 
-                    val injection_string = reader(inputStream)
-                    callback(injection_string)
+                    if (WebViewSecurityPolicy.hasExpectedRemoteInjectorHash(scriptBytes)) {
+                        remoteCode = reader(ByteArrayInputStream(scriptBytes))
+                    } else {
+                        Log.e("InjectionBuilder", "Remote injector hash mismatch")
+                    }
                 } else {
                     Log.e("InjectionBuilder", "Error response code: ${connection.responseCode}")
                 }
             } catch (e: Exception) {
                 Log.e("InjectionBuilder", "Error fetching JavaScript file: ${e.message}")
             } finally {
-                latch.countDown()
+                connection?.disconnect()
+                callback(remoteCode)
             }
         }.start()
     }
 
     fun fetchLocal(callback: (String) -> Unit) {
-        val input_stream = this.application.assets.open("Injector.js")
-        callback(reader(input_stream))
+        this.application.assets.open("Injector.js").use {
+            callback(reader(it))
+        }
     }
 
     fun getCode(callback: (String) -> Unit) {
-        var state = getState()
-
-        // If application is in debug mode
-        if (0 != application.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) {
-            state = false
-        }
-
-        if (state) { //remote
-            fetchRemote { callback(it) }
+        if (isRemoteFetchingEnabled()) {
+            fetchRemote {
+                if (it != null) {
+                    callback(it)
+                } else {
+                    Log.w("InjectionBuilder", "Falling back to local script")
+                    fetchLocal(callback)
+                }
+            }
             Log.d("InjectionBuilder", "Use remote script")
         } else { // local
             fetchLocal { callback(it) }
@@ -67,15 +75,13 @@ class InjectionBuilder(
         }
     }
 
-    private fun getState(): Boolean {
-        var state = false
-        try {
-            state = preferences.all?.getValue("remote_fetching") as Boolean
-        } catch (e: NoSuchElementException) {
-            Log.w("InjectionBuilder", "Could not find 'remote_fetching' preference")
-            //state = false
+    private fun isRemoteFetchingEnabled(): Boolean {
+        return try {
+            preferences.getBoolean("remote_fetching", false)
+        } catch (e: ClassCastException) {
+            Log.w("InjectionBuilder", "Invalid 'remote_fetching' preference type")
+            false
         }
-        return state // true = remote, false = local
     }
 
     private fun reader(input_stream: InputStream): String {

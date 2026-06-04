@@ -2,94 +2,50 @@ package com.example.noreel
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.webkit.ConsoleMessage
-import android.webkit.PermissionRequest
-import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import src.UpdateChecker
-import kotlin.concurrent.thread
 
 
 open class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
-    private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var settingsChanged: Boolean = false
 
     private lateinit var webView: WebView
 
     var injector_content = ""
 
-    val getFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_CANCELED) {
-            filePathCallback?.onReceiveValue(null)
-        } else if (it.resultCode == Activity.RESULT_OK && filePathCallback != null) {
-            filePathCallback!!.onReceiveValue(
-                WebChromeClient.FileChooserParams.parseResult(it.resultCode, it.data)
-            )
-            filePathCallback = null
-            Log.d("WebInternal", it.toString())
-        }
+    companion object {
+        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
     }
 
     fun updateBrowser(webView: WebView) {
-        webView.loadUrl("https://www.instagram.com/")
-    }
-
-    fun isOnline(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (connectivityManager != null) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            if (capabilities != null) {
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
-                    return true
-                }
-            }
-        }
-        return false
+        webView.loadUrl(WebViewSecurityPolicy.HOME_URL)
     }
 
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, p1: String?) {
         Log.d("Settings", "Changed: ${preferences?.all?.entries?.toTypedArray().contentToString()}")
-        InjectionBuilder(application, preferences!!).getCode() {
+        if (preferences == null) {
+            return
+        }
+
+        InjectionBuilder(application, preferences).getCode() {
             injector_content = it
         }
     }
@@ -103,22 +59,10 @@ open class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPrefere
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.instagram_webview)
-
-        val readExternalStorage = Manifest.permission.READ_EXTERNAL_STORAGE
-
-        // readExternalStorage
-        if (ContextCompat.checkSelfPermission(
-                this,
-                readExternalStorage
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(this, arrayOf(readExternalStorage), 23)
-        }
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         preferences.registerOnSharedPreferenceChangeListener(this)
@@ -132,55 +76,45 @@ open class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPrefere
         }
         onSharedPreferenceChanged(preferences, "")
 
-        val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
-
-        val notificationPermission = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.VIBRATE
-        )
-        if (notificationPermission != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(
-                arrayOf(Manifest.permission.VIBRATE),
-                NOTIFICATION_PERMISSION_REQUEST_CODE
-            )
-        }
-
-        val name = "Updates"
-        val descriptionText = "Information if there is an update available"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel("Update", name, importance).apply {
-            description = descriptionText
-        }
-
-        // Register the channel with the system.
-        val notificationManager: NotificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+        requestNotificationPermissionIfNeeded()
+        createNotificationChannel()
 
         val updateChecker = UpdateChecker(this)
         updateChecker.fetchRemote()
 
         webView = findViewById(R.id.webview)
-        webView.settings.javaScriptEnabled = true
-        webView.settings.domStorageEnabled = true
-        webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
-        webView.settings.mediaPlaybackRequiresUserGesture = false
-        webView.settings.allowContentAccess = true
+        webView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            cacheMode = WebSettings.LOAD_NO_CACHE
+            mediaPlaybackRequiresUserGesture = false
+            mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+            setAllowContentAccess(false)
+            setAllowFileAccess(false)
+            setAllowFileAccessFromFileURLs(false)
+            setAllowUniversalAccessFromFileURLs(false)
+            setGeolocationEnabled(false)
+        }
         webView.overScrollMode = View.OVER_SCROLL_NEVER
         webView.isVerticalScrollBarEnabled = false
 
-        val JSInterface = AndroidJSInterface(preferences_button, this, Runnable { updateBrowser(webView) })
+        val JSInterface = AndroidJSInterface(
+            preferences_button,
+            this,
+            Runnable { updateBrowser(webView) },
+            { webView.url }
+        )
         webView.addJavascriptInterface(JSInterface, "Android")
 
-        // If application is in debug mode
-        if (0 != applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) {
-            WebView.setWebContentsDebuggingEnabled(true)
-        }
+        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
         webView.webChromeClient = ChromeViewport()
 
         fun injectJS(webview: WebView?) {
-            webview?.loadUrl("javascript:(function f(){${injector_content}})()")
+            val target = webview ?: return
+            if (WebViewSecurityPolicy.canInjectJavaScript(target.url) && injector_content.isNotBlank()) {
+                target.evaluateJavascript("(function f(){${injector_content}})()", null)
+            }
         }
 
         val mainHandler = Handler(Looper.getMainLooper())
@@ -193,7 +127,7 @@ open class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPrefere
                 }
             })
 
-        webView.webViewClient = WebViewViewport()
+        webView.webViewClient = WebViewViewport(this)
 
         onBackPressedDispatcher.addCallback(
             object : OnBackPressedCallback(true) {
@@ -205,5 +139,36 @@ open class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPrefere
             })
 
         updateBrowser(webView)
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                NOTIFICATION_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return
+        }
+
+        val name = "Updates"
+        val descriptionText = "Information if there is an update available"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel("Update", name, importance).apply {
+            description = descriptionText
+        }
+
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 }

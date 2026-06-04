@@ -57,7 +57,7 @@ if (settings_icon){
 ### 3. InjectionBuilder
 Located at `app/src/main/java/com/example/noreel/InjectionBuilder.kt`, this utility manages the lifecycle of the injection script. It supports two modes of operation:
 
-*   **Remote Fetching (`fetchRemote`):** Downloads the latest `Injector.js` from the GitHub repository. This is used for hot-patching the UI logic without requiring an app update.
+*   **Remote Fetching (`fetchRemote`):** Opt-in only. Downloads the pinned `Injector.js` URL from GitHub and accepts it only when the SHA-256 hash matches the bundled script.
 *   **Local Loading (`fetchLocal`):** Loads the `Injector.js` file bundled within the `app/src/main/assets/` directory.
 
 ## Integration Lifecycle
