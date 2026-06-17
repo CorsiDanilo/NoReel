@@ -1,4 +1,4 @@
-[⬅ Previous](./02-setup.md) | [🏠 Index](./README.md) | [Next ➡](./04-js-bridge-architecture.md)
+[⬅ Previous](./03-setup.md) | [🏠 Index](./README.md) | [Next ➡](./05-js-bridge-architecture.md)
 
 # Deployment & CI/CD
 
@@ -94,4 +94,4 @@ If a release is identified as faulty:
 
 **Confidence:** 90%
 
-[⬅ Previous](./02-setup.md) | [🏠 Index](./README.md) | [Next ➡](./04-js-bridge-architecture.md)
+[⬅ Previous](./03-setup.md) | [🏠 Index](./README.md) | [Next ➡](./05-js-bridge-architecture.md)

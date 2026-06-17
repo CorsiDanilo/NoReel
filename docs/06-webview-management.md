@@ -1,4 +1,4 @@
-[⬅ Previous](./04-js-bridge-architecture.md) | [🏠 Index](./README.md)
+[⬅ Previous](./05-js-bridge-architecture.md) | [🏠 Index](./README.md)
 
 # WebView and Viewport Management
 
@@ -151,4 +151,4 @@ If logs are not appearing in Logcat:
 
 - `ChromeViewport.kt`: ChromeViewport.kt
 
-[⬅ Previous](./04-js-bridge-architecture.md) | [🏠 Index](./README.md)
+[⬅ Previous](./05-js-bridge-architecture.md) | [🏠 Index](./README.md)

@@ -1,4 +1,4 @@
-[⬅ Previous](./01-overview.md) | [🏠 Index](./README.md) | [Next ➡](./03-deployment.md)
+[⬅ Previous](./02-structure.md) | [🏠 Index](./README.md) | [Next ➡](./04-deployment.md)
 
 # NoReel Local Development Setup
 
@@ -120,5 +120,6 @@ If the project fails to sync due to missing SDK components:
 3. Clean the project:
    ```bash
    ./gradlew clean
+   ```
 
-[⬅ Previous](./01-overview.md) | [🏠 Index](./README.md) | [Next ➡](./03-deployment.md)
+[⬅ Previous](./02-structure.md) | [🏠 Index](./README.md) | [Next ➡](./04-deployment.md)

@@ -1,4 +1,4 @@
-[⬅ Previous](./03-deployment.md) | [🏠 Index](./README.md) | [Next ➡](./05-webview-management.md)
+[⬅ Previous](./04-deployment.md) | [🏠 Index](./README.md) | [Next ➡](./06-webview-management.md)
 
 # JavaScript Bridge Architecture
 
@@ -117,4 +117,4 @@ If `Injector.js` fails to execute:
 
 - `InjectionBuilder.kt`: InjectionBuilder.kt
 
-[⬅ Previous](./03-deployment.md) | [🏠 Index](./README.md) | [Next ➡](./05-webview-management.md)
+[⬅ Previous](./04-deployment.md) | [🏠 Index](./README.md) | [Next ➡](./06-webview-management.md)

@@ -1,4 +1,4 @@
-[🏠 Index](./README.md) | [Next ➡](./02-setup.md)
+[🏠 Index](./README.md) | [Next ➡](./02-structure.md)
 
 # Project Overview
 
@@ -71,6 +71,6 @@ fun openInStdBrowser(url: String){
 ## Documentation Quick Links
 
 *   **[README](README.md)**: Project introduction and setup instructions.
-*   **[Changelog](CHANGELOG.md)**: Version history and release notes.
+*   **[Changelog](../CHANGELOG.md)**: Version history and release notes.
 
-[🏠 Index](./README.md) | [Next ➡](./02-setup.md)
+[🏠 Index](./README.md) | [Next ➡](./02-structure.md)
